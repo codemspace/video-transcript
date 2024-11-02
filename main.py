@@ -337,9 +337,15 @@ class VideoCreation:
         # Get the bounding box for the text
         _, _, w, h = draw.textbbox((0, 0), text, font=font)
 
-        # Draw the text on the image with stroke for better visibility
-        draw.text(((max_width - w) / 2, round(h * 0.2)), text, font=font, fill="white",
-                  stroke_width=FONT_BORDER_WEIGHT, stroke_fill="black")
+        # Draw the text on the image with a reduced stroke for a softer effect
+        draw.text(
+            ((max_width - w) / 2, round(h * 0.2)),  # Centered text
+            text,
+            font=font,
+            fill="white",  # Text color
+            stroke_width=1,  # Reduced stroke width for softer blur effect
+            stroke_fill="grey"  # Softer stroke color for subtle contrast
+        )
 
         image = image.crop((0, 0, max_width, round(h * 1.6)))  # Crop the image to the desired size
         logging.info(f"Created text image for: '{text}'")
