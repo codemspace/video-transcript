@@ -214,7 +214,7 @@ class VideoCreation:
     def process(self) -> VideoClip:
         # Main processing function to create the final video with captions
         transcription = self.create_transcription(self.audio)  # Generate transcription from audio
-        logging.info(f"Transcription generated: {transcription}")
+        # logging.info(f"Transcription generated: {transcription}")
         
         # Check if transcription is empty
         if not transcription:
@@ -348,7 +348,7 @@ class VideoCreation:
         )
 
         image = image.crop((0, 0, max_width, round(h * 1.6)))  # Crop the image to the desired size
-        logging.info(f"Created text image for: '{text}'")
+        # logging.info(f"Created text image for: '{text}'")
 
         return image  # Return the created text image
 
