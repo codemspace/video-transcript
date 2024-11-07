@@ -9,7 +9,7 @@ NUM_THREADS = 12 # The number of threads used to save the editted video
 ## Font settings
 # FONT_NAME = 'Super Carnival.ttf' # The name of the font file used for captions
 FONT_NAME = 'Roboto-Regular.ttf' # The name of the font file used for captions
-FONT_SIZE = 50
+FONT_SIZE = 16
 FONT_BORDER_WEIGHT = 10
 
 ## Video settings

@@ -214,9 +214,7 @@ class VideoCreation:
     def process(self) -> VideoClip:
         # Main processing function to create the final video with captions
         transcription = self.create_transcription(self.audio)  # Generate transcription from audio
-        # logging.info(f"Transcription generated: {transcription}")
-        
-        # Check if transcription is empty
+
         if not transcription:
             logging.warning("No transcription available. Returning original clip without captions.")
             return self.clip
@@ -261,14 +259,14 @@ class VideoCreation:
         return timestamps  # Return the list of timestamps and words
 
     def add_captions_to_video(self, clip, timestamps):
-        # Add captions to the video based on the provided timestamps and max word count
+        # Add captions to the video based on the provided timestamps
         if len(timestamps) == 0:
             return clip  # Return the original clip if no timestamps
 
         clips = []  # List to hold video clips with captions
         start_time = 0  # Track the start time of each caption segment
         caption_text = ""  # Accumulates words for a caption
-        max_caption_words = 8  # Maximum number of words per caption segment
+        max_caption_words = 12  # Maximum number of words per caption segment
 
         word_count = 0  # Track the number of words in the current caption segment
 
@@ -276,13 +274,12 @@ class VideoCreation:
             start, end = timestamp["timestamp"]
             word = timestamp["text"]
 
-            # Add the word to the current caption text
+            # Append words to the current caption text
             caption_text += f" {word}"
             word_count += 1
 
-            # Check if we've reached the max word count or end of sentence
-            if word_count >= max_caption_words or word.endswith(('.', '!', '?')):
-                # Add the captioned clip for the accumulated text
+            # Check for end of sentence or word limit
+            if word_count >= max_caption_words or word.endswith(('.', '!', '?', 'Mr.', 'Mrs.', 'Dr.', 'Ms.')):
                 captioned_clip = self.add_text_to_video(clip.subclip(start_time, end), caption_text.strip())
                 clips.append(captioned_clip)
 
@@ -291,7 +288,7 @@ class VideoCreation:
                 caption_text = ""
                 word_count = 0
 
-        # Append any remaining text as the last caption
+        # Add any remaining caption as the last clip
         if caption_text:
             captioned_clip = self.add_text_to_video(clip.subclip(start_time, clip.duration), caption_text.strip())
             clips.append(captioned_clip)
@@ -301,15 +298,14 @@ class VideoCreation:
 
         return final_clip  # Return the final clip with captions
 
-
     def add_text_to_video(self, clip, text):
-        # Add text overlay to the video clip
+        # Add text overlay to the video clip without stroke
         font_path = os.path.join(FONTS_DIR, FONT_NAME)
         if not os.path.exists(font_path):
             logging.error(f"Font file not found: {font_path}")
             return clip  # Return original clip if font is missing
 
-        # Create the text image
+        # Create the text image without stroke
         text_image = self.create_text_image(text, font_path, FONT_SIZE, clip.size[0])
         if text_image is None:
             logging.error("Failed to create text image.")
@@ -324,7 +320,7 @@ class VideoCreation:
         return clip  # Return the video clip with text
 
     def create_text_image(self, text, font_path, font_size, max_width):
-        # Create an image with the specified text
+        # Create an image with the specified text without stroke
         try:
             font = ImageFont.truetype(font_path, font_size)  # Load the specified font
         except IOError:
@@ -337,19 +333,15 @@ class VideoCreation:
         # Get the bounding box for the text
         _, _, w, h = draw.textbbox((0, 0), text, font=font)
 
-        # Draw the text on the image with a reduced stroke for a softer effect
+        # Draw the text without stroke
         draw.text(
             ((max_width - w) / 2, round(h * 0.2)),  # Centered text
             text,
             font=font,
-            fill="white",  # Text color
-            stroke_width=1,  # Reduced stroke width for softer blur effect
-            stroke_fill="grey"  # Softer stroke color for subtle contrast
+            fill="white"  # Text color without stroke
         )
 
         image = image.crop((0, 0, max_width, round(h * 1.6)))  # Crop the image to the desired size
-        # logging.info(f"Created text image for: '{text}'")
-
         return image  # Return the created text image
 
 
